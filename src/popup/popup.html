@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Huh?</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <span class="huh-logo">
+      <span class="mark" aria-hidden="true"></span>
+      <span>Huh?</span>
+    </span>
+    <button id="openSettings" class="icon-btn" title="Settings" type="button" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06A2 2 0 1 1 4.21 16.95l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 7.05 4.21l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
+  </header>
+  <p class="subtitle">Make confusing things make sense.</p>
+
+  <section id="pasteSection">
+    <label for="pasteInput" class="sr-only">Text to explain</label>
+    <textarea id="pasteInput" rows="5" placeholder="Paste anything confusing here…"></textarea>
+    <div class="actions">
+      <button id="explainBtn" class="primary" type="button">
+        <span class="btn-icon" aria-hidden="true">✨</span>
+        Explain it to me
+      </button>
+    </div>
+  </section>
+
+  <section id="loadingSection" hidden>
+    <div class="thinking">
+      <div class="loading"><span></span><span></span><span></span></div>
+      <p class="thinking-text">Thinking like a 5-year-old…</p>
+    </div>
+  </section>
+
+  <section id="resultSection" hidden>
+    <div class="bubble">
+      <div id="result" class="result"></div>
+    </div>
+    <div class="actions">
+      <button id="simplerBtn" class="pill" type="button">
+        <span aria-hidden="true">↓</span> Simpler please
+      </button>
+      <button id="copyBtn" class="pill" type="button">
+        <span aria-hidden="true">⧉</span> Copy
+      </button>
+      <button id="backBtn" class="pill ghost" type="button">Back</button>
+      <span id="copyStatus" class="status" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section id="errorSection" hidden>
+    <div class="error-card">
+      <span class="error-icon" aria-hidden="true">!</span>
+      <p id="errorMsg" class="error"></p>
+    </div>
+    <div class="actions">
+      <button id="errorSettingsBtn" class="primary" type="button" hidden>Open Settings</button>
+      <button id="errorBackBtn" class="pill ghost" type="button">Back</button>
+    </div>
+  </section>
+
+  <section id="historySection">
+    <h2>
+      <span>Recent</span>
+      <span class="history-hint" id="historyHint" hidden>last 5</span>
+    </h2>
+    <ul id="historyList" class="history"></ul>
+  </section>
+
+  <script src="../dev/chrome-stub.js"></script>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

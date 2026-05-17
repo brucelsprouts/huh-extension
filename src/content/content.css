@@ -1,0 +1,3 @@
+/* Host-page-level styles. We keep this nearly empty because the card lives in a shadow DOM. */
+/* Reserve the host element from being affected by extreme page CSS by giving it a clean baseline. */
+:host { all: initial; }

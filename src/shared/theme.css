@@ -1,0 +1,72 @@
+:root {
+  --huh-bg: #fbf6ef;
+  --huh-bg-elevated: #ffffff;
+  --huh-text: #1f1b2e;
+  --huh-text-muted: #7a7387;
+  --huh-border: #ece2d3;
+  --huh-border-strong: #d8ccba;
+  --huh-accent: #6366f1;
+  --huh-accent-2: #f472b6;
+  --huh-accent-hover: #4f46e5;
+  --huh-accent-fg: #ffffff;
+  --huh-accent-soft: rgba(99, 102, 241, 0.10);
+  --huh-gradient: linear-gradient(135deg, #818cf8 0%, #f472b6 100%);
+  --huh-danger: #dc2626;
+  --huh-warm: #fef3c7;
+  --huh-radius: 14px;
+  --huh-radius-sm: 10px;
+  --huh-radius-pill: 999px;
+  --huh-shadow-sm: 0 1px 2px rgba(31, 27, 46, 0.06);
+  --huh-shadow: 0 8px 24px rgba(31, 27, 46, 0.10), 0 1px 3px rgba(31, 27, 46, 0.06);
+  --huh-shadow-lg: 0 20px 40px rgba(31, 27, 46, 0.16);
+  --huh-font: "Nunito", "Segoe UI", ui-sans-serif, system-ui, -apple-system, Roboto, sans-serif;
+  --huh-font-display: "Nunito", "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --huh-bg: #16131f;
+    --huh-bg-elevated: #221d31;
+    --huh-text: #f6f1ee;
+    --huh-text-muted: #a299b3;
+    --huh-border: #2f2942;
+    --huh-border-strong: #3d3552;
+    --huh-accent: #a5b4fc;
+    --huh-accent-2: #f9a8d4;
+    --huh-accent-hover: #c7d2fe;
+    --huh-accent-fg: #16131f;
+    --huh-accent-soft: rgba(165, 180, 252, 0.12);
+    --huh-gradient: linear-gradient(135deg, #a5b4fc 0%, #f9a8d4 100%);
+    --huh-danger: #f87171;
+    --huh-warm: #3a2e1f;
+    --huh-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --huh-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.25);
+    --huh-shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.55);
+  }
+}
+
+.huh-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--huh-font-display);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: var(--huh-text);
+}
+.huh-logo .mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--huh-gradient);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 900;
+  font-size: 17px;
+  box-shadow: var(--huh-shadow-sm);
+  transform: rotate(-6deg);
+}
+.huh-logo .mark::after { content: "?"; line-height: 1; }

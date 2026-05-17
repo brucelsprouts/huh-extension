@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment / secrets
+.env
+.env.local
+*.key
+config.local.json
+
+# Build outputs
+dist/
+build/
+*.zip
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Misc
+.cache/
+tmp/
