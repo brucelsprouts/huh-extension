@@ -40,7 +40,12 @@ h1 {
   font-size: 13px;
   color: var(--huh-text-muted);
   font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 480px;
 }
+header { min-height: 64px; }
 .header-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
 .card {

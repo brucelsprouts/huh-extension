@@ -200,6 +200,48 @@ function renderCard({ state }) {
   root.querySelectorAll('[data-action]').forEach(el => {
     el.addEventListener('click', () => handleAction(el.dataset.action));
   });
+
+  enableDrag(cardEl, root.querySelector('header'));
+}
+
+function enableDrag(cardEl, handle) {
+  if (!handle) return;
+  let dragging = false;
+  let startX = 0, startY = 0;
+  let originLeft = 0, originTop = 0;
+
+  handle.addEventListener('mousedown', (e) => {
+    if (e.target.closest('[data-action]')) return; // don't drag when clicking close
+    dragging = true;
+    handle.classList.add('dragging');
+    const rect = cardEl.getBoundingClientRect();
+    originLeft = rect.left;
+    originTop = rect.top;
+    startX = e.clientX;
+    startY = e.clientY;
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const rect = cardEl.getBoundingClientRect();
+    let nextLeft = originLeft + dx;
+    let nextTop = originTop + dy;
+    nextLeft = Math.max(4, Math.min(vw - rect.width - 4, nextLeft));
+    nextTop = Math.max(4, Math.min(vh - rect.height - 4, nextTop));
+    cardEl.style.left = `${nextLeft}px`;
+    cardEl.style.top = `${nextTop}px`;
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+  });
 }
 
 let session = { originalText: '', level: 1 };

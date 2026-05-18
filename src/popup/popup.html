@@ -24,28 +24,23 @@
 
   <section id="pasteSection">
     <textarea id="pasteInput" rows="5" placeholder="// paste text to explain"></textarea>
-    <button id="explainBtn" class="primary" type="button">explain →</button>
+    <button id="explainBtn" class="primary" type="button">
+      <span class="btn-label">explain →</span>
+      <span class="huh-loading" id="explainLoader" hidden><span></span><span></span><span></span></span>
+    </button>
+    <p id="inlineError" class="inline-error" hidden></p>
+    <div class="inline-error-actions" id="inlineErrorActions" hidden>
+      <button id="errorSettingsBtn" class="ghost" type="button">⚙ open settings</button>
+    </div>
   </section>
 
-<section id="resultSection" hidden>
+  <section id="resultSection" hidden>
     <div id="result" class="result"></div>
     <div class="actions">
       <button id="simplerBtn" class="ghost" type="button">↓ simpler</button>
       <button id="copyBtn" class="ghost" type="button">⧉ copy</button>
-      <button id="backBtn" class="ghost" type="button">← back</button>
+      <button id="backBtn" class="ghost" type="button">← new</button>
       <span id="copyStatus" class="status" aria-live="polite"></span>
-    </div>
-  </section>
-
-  <section id="errorSection" hidden>
-    <p id="errorMsg" class="error"></p>
-    <details id="errorDetailWrap" hidden class="error-details">
-      <summary>// show details</summary>
-      <pre id="errorDetail"></pre>
-    </details>
-    <div class="actions">
-      <button id="errorSettingsBtn" class="primary" type="button" hidden>open settings</button>
-      <button id="errorBackBtn" class="ghost" type="button">← back</button>
     </div>
   </section>
 

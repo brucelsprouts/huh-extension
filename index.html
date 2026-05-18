@@ -20,17 +20,20 @@
         </div>
       </div>
       <div class="header-actions">
-        <a id="openSettings" class="ghost nav-btn" href="/settings.html">⚙ settings</a>
+        <button id="openSettings" class="ghost nav-btn" type="button">⚙ settings</button>
       </div>
     </header>
 
     <section id="pasteSection" class="card">
       <div class="card-label">// input</div>
       <textarea id="pasteInput" rows="6" placeholder="// paste text to explain"></textarea>
-      <button id="explainBtn" class="primary" type="button">explain →</button>
+      <button id="explainBtn" class="primary" type="button">
+        <span class="btn-label">explain →</span>
+        <span class="huh-loading" id="explainLoader" hidden><span></span><span></span><span></span></span>
+      </button>
       <p id="inlineError" class="inline-error" hidden></p>
       <div class="inline-error-actions" id="inlineErrorActions" hidden>
-        <a id="errorSettingsBtn" class="ghost nav-btn" href="/settings.html">⚙ open settings</a>
+        <button id="errorSettingsBtn" class="ghost nav-btn" type="button">⚙ open settings</button>
       </div>
     </section>
 

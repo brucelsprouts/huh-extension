@@ -20,6 +20,8 @@ const $clearHistory = document.getElementById('clearHistory');
 const $copyAll = document.getElementById('copyAllHistory');
 const $export = document.getElementById('exportHistory');
 const $modelSelect = document.getElementById('modelSelect');
+const $openPage = document.getElementById('openPage');
+if ($openPage) $openPage.addEventListener('click', () => { window.location.href = '/'; });
 
 async function init() {
   $key.value = await getApiKey();

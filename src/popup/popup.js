@@ -1,18 +1,17 @@
 const $paste = document.getElementById('pasteSection');
 const $result = document.getElementById('resultSection');
-const $error = document.getElementById('errorSection');
 const $input = document.getElementById('pasteInput');
 const $explain = document.getElementById('explainBtn');
+const $explainLabel = $explain.querySelector('.btn-label');
+const $explainLoader = document.getElementById('explainLoader');
 const $simpler = document.getElementById('simplerBtn');
 const $copy = document.getElementById('copyBtn');
 const $back = document.getElementById('backBtn');
 const $resultBox = document.getElementById('result');
 const $copyStatus = document.getElementById('copyStatus');
-const $errorMsg = document.getElementById('errorMsg');
-const $errorDetailWrap = document.getElementById('errorDetailWrap');
-const $errorDetail = document.getElementById('errorDetail');
+const $inlineError = document.getElementById('inlineError');
+const $inlineErrorActions = document.getElementById('inlineErrorActions');
 const $errorSettings = document.getElementById('errorSettingsBtn');
-const $errorBack = document.getElementById('errorBackBtn');
 const $openSettings = document.getElementById('openSettings');
 const $openPage = document.getElementById('openPage');
 const $historyList = document.getElementById('historyList');
@@ -21,15 +20,38 @@ const $historySection = document.getElementById('historySection');
 let state = { originalText: '', level: 1, fromHistory: false };
 let inFlight = false;
 
-function show(section) {
-  for (const s of [$paste, $result, $error]) s.hidden = (s !== section);
+function clearError() {
+  $inlineError.hidden = true;
+  $inlineError.textContent = '';
+  $inlineErrorActions.hidden = true;
+}
+
+function showError(msg, withSettings) {
+  $inlineError.textContent = msg;
+  $inlineError.hidden = false;
+  $inlineErrorActions.hidden = !withSettings;
+}
+
+function showInput({ focus = false } = {}) {
+  $paste.hidden = false;
+  $result.hidden = true;
   $simpler.hidden = state.fromHistory;
+  if (focus) $input.focus();
+}
+
+function showResult() {
+  $paste.hidden = true;
+  $result.hidden = false;
+  $simpler.hidden = state.fromHistory;
+  clearError();
 }
 
 function setBusy(busy) {
   inFlight = busy;
   $explain.disabled = busy;
   $simpler.disabled = busy;
+  if ($explainLabel) $explainLabel.textContent = busy ? 'thinking' : 'explain →';
+  if ($explainLoader) $explainLoader.hidden = !busy;
 }
 
 function errorMessage(code, detail) {
@@ -51,25 +73,20 @@ function errorMessage(code, detail) {
 async function explain(text, level) {
   if (inFlight) return;
   state = { originalText: text, level, fromHistory: false };
+  clearError();
   setBusy(true);
   try {
     const res = await chrome.runtime.sendMessage({ type: 'explain', text, level });
     if (res?.ok) {
       $resultBox.textContent = res.explanation;
-      show($result);
+      showResult();
       renderHistory();
     } else {
+      const code = res?.errorCode;
       const detail = (res?.detail || '').trim();
-      $errorMsg.textContent = errorMessage(res?.errorCode, detail);
-      const isQuotaZero = res?.errorCode === 'RATE_LIMIT' && /limit:\s*0/i.test(detail);
-      $errorSettings.hidden = !(res?.errorCode === 'NO_KEY' || res?.errorCode === 'BAD_KEY' || isQuotaZero);
-      if (detail) {
-        $errorDetail.textContent = detail;
-        $errorDetailWrap.hidden = false;
-      } else {
-        $errorDetailWrap.hidden = true;
-      }
-      show($error);
+      const needsSettings = code === 'NO_KEY' || code === 'BAD_KEY'
+        || (code === 'RATE_LIMIT' && /limit:\s*0/i.test(detail));
+      showError(errorMessage(code, detail), needsSettings);
     }
   } finally {
     setBusy(false);
@@ -78,7 +95,10 @@ async function explain(text, level) {
 
 $explain.addEventListener('click', () => {
   const text = $input.value.trim();
-  if (!text) return;
+  if (!text) {
+    showError(errorMessage('TOO_SHORT'), false);
+    return;
+  }
   explain(text, 1);
 });
 
@@ -88,18 +108,25 @@ $simpler.addEventListener('click', () => {
 });
 
 $copy.addEventListener('click', async () => {
-  await navigator.clipboard.writeText($resultBox.textContent);
-  $copyStatus.textContent = 'Copied!';
+  try {
+    await navigator.clipboard.writeText($resultBox.textContent);
+    $copyStatus.textContent = 'Copied!';
+  } catch (_) {
+    $copyStatus.textContent = 'Copy failed';
+  }
   setTimeout(() => { $copyStatus.textContent = ''; }, 1500);
 });
 
-$back.addEventListener('click', () => show($paste));
-$errorBack.addEventListener('click', () => show($paste));
+$back.addEventListener('click', () => {
+  $input.value = '';
+  state = { originalText: '', level: 1, fromHistory: false };
+  showInput({ focus: true });
+});
+
 $errorSettings.addEventListener('click', () => chrome.runtime.openOptionsPage());
 $openSettings.addEventListener('click', () => chrome.runtime.openOptionsPage());
 
 if ($openPage) {
-  // Hide the "open in tab" button when we're already in the page-mode tab.
   if (document.documentElement.dataset.surface === 'page') {
     $openPage.hidden = true;
   } else {
@@ -146,7 +173,7 @@ async function renderHistory() {
     btn.addEventListener('click', () => {
       state = { originalText: '', level: item.level, fromHistory: true };
       $resultBox.textContent = item.explanation;
-      show($result);
+      showResult();
     });
     li.appendChild(btn);
     $historyList.appendChild(li);

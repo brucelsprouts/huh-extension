@@ -13,8 +13,15 @@ const $resultBox = document.getElementById('result');
 const $copyStatus = document.getElementById('copyStatus');
 const $inlineError = document.getElementById('inlineError');
 const $inlineErrorActions = document.getElementById('inlineErrorActions');
+const $errorSettings = document.getElementById('errorSettingsBtn');
+const $openSettings = document.getElementById('openSettings');
+const $explainLoader = document.getElementById('explainLoader');
+const $explainLabel = $explain.querySelector('.btn-label');
 const $historyList = document.getElementById('historyList');
 const $historySection = document.getElementById('historySection');
+
+$openSettings.addEventListener('click', () => { window.location.href = '/settings.html'; });
+$errorSettings.addEventListener('click', () => { window.location.href = '/settings.html'; });
 
 let state = { originalText: '', level: 1, fromHistory: false };
 let inFlight = false;
@@ -55,7 +62,8 @@ function setBusy(busy) {
   inFlight = busy;
   $explain.disabled = busy;
   $simpler.disabled = busy;
-  $explain.textContent = busy ? 'thinking…' : 'explain →';
+  if ($explainLabel) $explainLabel.textContent = busy ? 'thinking' : 'explain →';
+  if ($explainLoader) $explainLoader.hidden = !busy;
 }
 
 function errorMessage(code, detail) {
