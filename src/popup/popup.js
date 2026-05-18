@@ -10,8 +10,6 @@ const $back = document.getElementById('backBtn');
 const $resultBox = document.getElementById('result');
 const $copyStatus = document.getElementById('copyStatus');
 const $inlineError = document.getElementById('inlineError');
-const $inlineErrorActions = document.getElementById('inlineErrorActions');
-const $errorSettings = document.getElementById('errorSettingsBtn');
 const $openSettings = document.getElementById('openSettings');
 const $openPage = document.getElementById('openPage');
 const $historyList = document.getElementById('historyList');
@@ -23,13 +21,11 @@ let inFlight = false;
 function clearError() {
   $inlineError.hidden = true;
   $inlineError.textContent = '';
-  $inlineErrorActions.hidden = true;
 }
 
-function showError(msg, withSettings) {
+function showError(msg) {
   $inlineError.textContent = msg;
   $inlineError.hidden = false;
-  $inlineErrorActions.hidden = !withSettings;
 }
 
 function showInput({ focus = false } = {}) {
@@ -84,9 +80,7 @@ async function explain(text, level) {
     } else {
       const code = res?.errorCode;
       const detail = (res?.detail || '').trim();
-      const needsSettings = code === 'NO_KEY' || code === 'BAD_KEY'
-        || (code === 'RATE_LIMIT' && /limit:\s*0/i.test(detail));
-      showError(errorMessage(code, detail), needsSettings);
+      showError(errorMessage(code, detail));
     }
   } finally {
     setBusy(false);
@@ -96,7 +90,7 @@ async function explain(text, level) {
 $explain.addEventListener('click', () => {
   const text = $input.value.trim();
   if (!text) {
-    showError(errorMessage('TOO_SHORT'), false);
+    showError(errorMessage('TOO_SHORT'));
     return;
   }
   explain(text, 1);
@@ -123,7 +117,6 @@ $back.addEventListener('click', () => {
   showInput({ focus: true });
 });
 
-$errorSettings.addEventListener('click', () => chrome.runtime.openOptionsPage());
 $openSettings.addEventListener('click', () => chrome.runtime.openOptionsPage());
 
 if ($openPage) {
@@ -180,4 +173,24 @@ async function renderHistory() {
   }
 }
 
+async function prefillFromActiveTabSelection() {
+  // Only do this in the real extension popup, not the page-mode tab.
+  if (document.documentElement.dataset.surface === 'page') return;
+  if (!chrome?.tabs?.query) return;
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) return;
+    const res = await chrome.tabs.sendMessage(tab.id, { type: 'huh:getSelection' });
+    const text = (res?.text || '').trim();
+    if (!text) return;
+    // Prefill but don't auto-run — let the user hit "explain" so they can edit/cancel.
+    $input.value = text;
+    $input.focus();
+    $input.select();
+  } catch (_) {
+    // Content script may not be loaded (chrome:// pages, the Web Store, etc.). Silent fallback.
+  }
+}
+
 renderHistory();
+prefillFromActiveTabSelection();

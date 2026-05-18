@@ -7,7 +7,7 @@ const CONTEXT_MENU_ID = 'huh-explain-selection';
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: CONTEXT_MENU_ID,
-    title: 'Explain with Huh?',
+    title: 'huh?',
     contexts: ['selection'],
   });
 });

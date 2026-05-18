@@ -1,4 +1,5 @@
-const HOST_ID = 'huh-extension-host';
+const HOST_CLASS = 'huh-extension-host';
+let instanceCount = 0;
 const CARD_CSS = `
   :host { all: initial; }
   .card {
@@ -27,7 +28,16 @@ const CARD_CSS = `
     button.btn:hover { background: #18181b !important; color: #fafafa !important; }
     .close:hover { background: #18181b !important; color: #fafafa !important; }
   }
-  header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom: 10px; }
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    cursor: grab;
+    user-select: none;
+  }
+  header.dragging { cursor: grabbing; }
+  header [data-action] { cursor: pointer; }
   .brand-name {
     font-weight: 700;
     font-size: 14px;
@@ -119,21 +129,9 @@ function errorMessage(code, detail) {
   }
 }
 
-function ensureHost() {
-  let host = document.getElementById(HOST_ID);
-  if (host) return host;
-  host = document.createElement('div');
-  host.id = HOST_ID;
-  host.style.position = 'fixed';
-  host.style.top = '0';
-  host.style.left = '0';
-  host.style.zIndex = '2147483647';
-  document.documentElement.appendChild(host);
-  host.attachShadow({ mode: 'open' });
-  return host;
-}
-
-function positionCard(cardEl) {
+// Position a brand-new card near the current selection, with a small
+// offset per existing card so multiple instances don't perfectly overlap.
+function initialCardPosition() {
   const sel = window.getSelection();
   let rect = null;
   if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
@@ -141,133 +139,120 @@ function positionCard(cardEl) {
   }
   const margin = 12;
   const vw = window.innerWidth, vh = window.innerHeight;
-  let top = margin, left = margin;
+  const existing = document.querySelectorAll(`.${HOST_CLASS}`).length;
+  const stagger = existing * 24;
+  let top = margin + stagger, left = margin + stagger;
   if (rect && rect.width > 0 && rect.height > 0) {
-    top = Math.min(rect.bottom + 8, vh - 240);
-    left = Math.min(Math.max(rect.left, margin), vw - 380);
+    top = Math.min(rect.bottom + 8 + stagger, vh - 240);
+    left = Math.min(Math.max(rect.left + stagger, margin), vw - 380);
   }
-  cardEl.style.top = `${Math.max(margin, top)}px`;
-  cardEl.style.left = `${Math.max(margin, left)}px`;
+  return { top: Math.max(margin, top), left: Math.max(margin, left) };
 }
 
-function renderCard({ state }) {
-  const host = ensureHost();
-  const root = host.shadowRoot;
-  root.innerHTML = `
-    <style>${CARD_CSS}</style>
-    <div class="card" role="dialog" aria-label="Huh? explanation">
-      <header>
-        <span class="brand">
-          <div class="brand-name">huh?</div>
-          <div class="brand-sub">say it like i'm five</div>
-        </span>
-        <button class="close" data-action="close" aria-label="Close">×</button>
-      </header>
-      <div class="content"></div>
-    </div>
-  `;
-  const cardEl = root.querySelector('.card');
-  const content = root.querySelector('.content');
-  positionCard(cardEl);
+// Each createCard() call returns a fully independent instance with its
+// own host, shadow root, session state, and in-flight flag.
+function createCard() {
+  instanceCount += 1;
+  const id = `huh-card-${Date.now()}-${instanceCount}`;
 
-  if (state.kind === 'loading') {
-    content.innerHTML = `<div class="loading"><span></span><span></span><span></span></div>`;
-  } else if (state.kind === 'result') {
-    content.innerHTML = `
-      <div class="body"></div>
-      <div class="actions">
-        <button class="btn" data-action="simpler">↓ simpler</button>
-        <button class="btn" data-action="copy">⧉ copy</button>
-        <button class="btn" data-action="openSettings">⚙ settings</button>
-        <span class="status" data-role="status"></span>
+  const host = document.createElement('div');
+  host.className = HOST_CLASS;
+  host.dataset.huhId = id;
+  host.style.position = 'fixed';
+  host.style.top = '0';
+  host.style.left = '0';
+  host.style.zIndex = String(2147483600 + instanceCount); // stack newer above older
+  document.documentElement.appendChild(host);
+  host.attachShadow({ mode: 'open' });
+
+  const startPos = initialCardPosition();
+  const instance = {
+    host,
+    root: host.shadowRoot,
+    session: { originalText: '', level: 1 },
+    inFlight: false,
+    startPos,
+  };
+
+  instance.close = () => { if (instance.host?.isConnected) instance.host.remove(); };
+
+  instance.render = (state) => {
+    const { root } = instance;
+    root.innerHTML = `
+      <style>${CARD_CSS}</style>
+      <div class="card" role="dialog" aria-label="Huh? explanation">
+        <header>
+          <span class="brand">
+            <div class="brand-name">huh?</div>
+            <div class="brand-sub">explain it like i'm five</div>
+          </span>
+          <button class="close" data-action="close" aria-label="Close">×</button>
+        </header>
+        <div class="content"></div>
       </div>
     `;
-    content.querySelector('.body').textContent = state.explanation;
-  } else if (state.kind === 'error') {
-    const isKeyErr = state.errorCode === 'NO_KEY' || state.errorCode === 'BAD_KEY';
-    const isQuotaZero = state.errorCode === 'RATE_LIMIT' && /limit:\s*0/i.test(state.detail || '');
-    const showSettings = isKeyErr || isQuotaZero;
-    content.innerHTML = `
-      <div class="body error"></div>
-      <div class="actions">
-        ${showSettings ? '<button class="btn" data-action="openSettings">⚙ settings</button>' : ''}
-        <button class="btn" data-action="close">dismiss</button>
-      </div>
-    `;
-    content.querySelector('.body').textContent = errorMessage(state.errorCode, state.detail);
-  }
+    const cardEl = root.querySelector('.card');
+    const content = root.querySelector('.content');
+    cardEl.style.top = `${instance.startPos.top}px`;
+    cardEl.style.left = `${instance.startPos.left}px`;
+    // After first render the position is "remembered" via inline style; subsequent
+    // renders for the same instance keep the card wherever the user dragged it.
+    instance.startPos = { top: cardEl.offsetTop, left: cardEl.offsetLeft };
 
-  root.querySelectorAll('[data-action]').forEach(el => {
-    el.addEventListener('click', () => handleAction(el.dataset.action));
-  });
+    if (state.kind === 'loading') {
+      content.innerHTML = `<div class="loading"><span></span><span></span><span></span></div>`;
+    } else if (state.kind === 'result') {
+      content.innerHTML = `
+        <div class="body"></div>
+        <div class="actions">
+          <button class="btn" data-action="simpler">↓ simpler</button>
+          <button class="btn" data-action="copy">⧉ copy</button>
+          <button class="btn" data-action="openSettings">⚙ settings</button>
+          <span class="status" data-role="status"></span>
+        </div>
+      `;
+      content.querySelector('.body').textContent = state.explanation;
+    } else if (state.kind === 'error') {
+      const isKeyErr = state.errorCode === 'NO_KEY' || state.errorCode === 'BAD_KEY';
+      const isQuotaZero = state.errorCode === 'RATE_LIMIT' && /limit:\s*0/i.test(state.detail || '');
+      const showSettings = isKeyErr || isQuotaZero;
+      content.innerHTML = `
+        <div class="body error"></div>
+        <div class="actions">
+          ${showSettings ? '<button class="btn" data-action="openSettings">⚙ settings</button>' : ''}
+          <button class="btn" data-action="close">dismiss</button>
+        </div>
+      `;
+      content.querySelector('.body').textContent = errorMessage(state.errorCode, state.detail);
+    }
 
-  enableDrag(cardEl, root.querySelector('header'));
-}
+    root.querySelectorAll('[data-action]').forEach(el => {
+      el.addEventListener('click', () => instance.handleAction(el.dataset.action));
+    });
 
-function enableDrag(cardEl, handle) {
-  if (!handle) return;
-  let dragging = false;
-  let startX = 0, startY = 0;
-  let originLeft = 0, originTop = 0;
+    attachDragHandle(cardEl, root.querySelector('header'));
 
-  handle.addEventListener('mousedown', (e) => {
-    if (e.target.closest('[data-action]')) return; // don't drag when clicking close
-    dragging = true;
-    handle.classList.add('dragging');
-    const rect = cardEl.getBoundingClientRect();
-    originLeft = rect.left;
-    originTop = rect.top;
-    startX = e.clientX;
-    startY = e.clientY;
-    e.preventDefault();
-  });
+    // Bring this card to the top whenever the user interacts with it.
+    cardEl.addEventListener('mousedown', () => {
+      instanceCount += 1;
+      host.style.zIndex = String(2147483600 + instanceCount);
+    }, true);
+  };
 
-  window.addEventListener('mousemove', (e) => {
-    if (!dragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const rect = cardEl.getBoundingClientRect();
-    let nextLeft = originLeft + dx;
-    let nextTop = originTop + dy;
-    nextLeft = Math.max(4, Math.min(vw - rect.width - 4, nextLeft));
-    nextTop = Math.max(4, Math.min(vh - rect.height - 4, nextTop));
-    cardEl.style.left = `${nextLeft}px`;
-    cardEl.style.top = `${nextTop}px`;
-  });
-
-  window.addEventListener('mouseup', () => {
-    if (!dragging) return;
-    dragging = false;
-    handle.classList.remove('dragging');
-  });
-}
-
-let session = { originalText: '', level: 1 };
-let inFlight = false;
-
-function close() {
-  const host = document.getElementById(HOST_ID);
-  if (host) host.remove();
-}
-
-async function handleAction(action) {
-  if (action === 'close') return close();
-  if (action === 'openSettings') {
-    chrome.runtime.sendMessage({ type: 'openOptions' }).catch(() => {});
-    return;
-  }
-  if (action === 'simpler') {
-    if (!session.originalText || inFlight) return;
-    return run(session.originalText, session.level + 1);
-  }
-  if (action === 'copy') {
-    const host = document.getElementById(HOST_ID);
-    if (!host) return;
-    const body = host.shadowRoot.querySelector('.body');
-    const status = host.shadowRoot.querySelector('[data-role="status"]');
-    if (body) {
+  instance.handleAction = async (action) => {
+    if (action === 'close') return instance.close();
+    if (action === 'openSettings') {
+      chrome.runtime.sendMessage({ type: 'openOptions' }).catch(() => {});
+      return;
+    }
+    if (action === 'simpler') {
+      if (!instance.session.originalText || instance.inFlight) return;
+      return instance.run(instance.session.originalText, instance.session.level + 1);
+    }
+    if (action === 'copy') {
+      const body = instance.root.querySelector('.body');
+      const status = instance.root.querySelector('[data-role="status"]');
+      if (!body) return;
       try {
         await navigator.clipboard.writeText(body.textContent || '');
         if (status) {
@@ -278,34 +263,83 @@ async function handleAction(action) {
         if (status) status.textContent = 'Copy failed';
       }
     }
-  }
+  };
+
+  instance.run = async (text, level) => {
+    instance.session = { originalText: text, level };
+    instance.inFlight = true;
+    instance.render({ kind: 'loading' });
+    try {
+      const res = await chrome.runtime.sendMessage({ type: 'explain', text, level });
+      if (res?.ok) {
+        instance.render({ kind: 'result', explanation: res.explanation });
+      } else {
+        instance.render({ kind: 'error', errorCode: res?.errorCode || 'UNKNOWN', detail: res?.detail || '' });
+      }
+    } finally {
+      instance.inFlight = false;
+    }
+  };
+
+  return instance;
 }
 
-async function run(text, level) {
-  session = { originalText: text, level };
-  inFlight = true;
-  renderCard({ state: { kind: 'loading' } });
-  try {
-    const res = await chrome.runtime.sendMessage({ type: 'explain', text, level });
-    if (res?.ok) {
-      renderCard({ state: { kind: 'result', explanation: res.explanation } });
-    } else {
-      renderCard({ state: { kind: 'error', errorCode: res?.errorCode || 'UNKNOWN', detail: res?.detail || '' } });
-    }
-  } finally {
-    inFlight = false;
-  }
+// Single global drag state — only one card can be dragged at a time anyway.
+const dragState = { active: false, cardEl: null, handle: null, startX: 0, startY: 0, originLeft: 0, originTop: 0 };
+
+function attachDragHandle(cardEl, handle) {
+  if (!handle) return;
+  handle.addEventListener('mousedown', (e) => {
+    if (e.target.closest('[data-action]')) return; // don't drag when clicking close
+    const rect = cardEl.getBoundingClientRect();
+    dragState.active = true;
+    dragState.cardEl = cardEl;
+    dragState.handle = handle;
+    dragState.originLeft = rect.left;
+    dragState.originTop = rect.top;
+    dragState.startX = e.clientX;
+    dragState.startY = e.clientY;
+    handle.classList.add('dragging');
+    e.preventDefault();
+  });
 }
+
+window.addEventListener('mousemove', (e) => {
+  if (!dragState.active || !dragState.cardEl) return;
+  const dx = e.clientX - dragState.startX;
+  const dy = e.clientY - dragState.startY;
+  const rect = dragState.cardEl.getBoundingClientRect();
+  let nextLeft = dragState.originLeft + dx;
+  let nextTop = dragState.originTop + dy;
+  nextLeft = Math.max(4, Math.min(window.innerWidth - rect.width - 4, nextLeft));
+  nextTop = Math.max(4, Math.min(window.innerHeight - rect.height - 4, nextTop));
+  dragState.cardEl.style.left = `${nextLeft}px`;
+  dragState.cardEl.style.top = `${nextTop}px`;
+});
+
+window.addEventListener('mouseup', () => {
+  if (!dragState.active) return;
+  dragState.active = false;
+  if (dragState.handle) dragState.handle.classList.remove('dragging');
+});
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg?.type === 'huh:showCard') {
     const text = (msg.text || '').trim();
+    const instance = createCard();
     if (!text) {
-      renderCard({ state: { kind: 'error', errorCode: 'TOO_SHORT' } });
+      instance.render({ kind: 'error', errorCode: 'TOO_SHORT' });
       sendResponse({ ok: true });
       return;
     }
-    run(text, 1);
+    instance.run(text, 1);
     sendResponse({ ok: true });
+    return;
+  }
+  if (msg?.type === 'huh:getSelection') {
+    let text = '';
+    try { text = (window.getSelection()?.toString() || '').trim(); } catch (_) { /* ignore */ }
+    sendResponse({ ok: true, text });
+    return;
   }
 });

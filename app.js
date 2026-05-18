@@ -12,8 +12,6 @@ const $back = document.getElementById('backBtn');
 const $resultBox = document.getElementById('result');
 const $copyStatus = document.getElementById('copyStatus');
 const $inlineError = document.getElementById('inlineError');
-const $inlineErrorActions = document.getElementById('inlineErrorActions');
-const $errorSettings = document.getElementById('errorSettingsBtn');
 const $openSettings = document.getElementById('openSettings');
 const $explainLoader = document.getElementById('explainLoader');
 const $explainLabel = $explain.querySelector('.btn-label');
@@ -21,7 +19,6 @@ const $historyList = document.getElementById('historyList');
 const $historySection = document.getElementById('historySection');
 
 $openSettings.addEventListener('click', () => { window.location.href = '/settings.html'; });
-$errorSettings.addEventListener('click', () => { window.location.href = '/settings.html'; });
 
 let state = { originalText: '', level: 1, fromHistory: false };
 let inFlight = false;
@@ -29,13 +26,11 @@ let inFlight = false;
 function clearError() {
   $inlineError.hidden = true;
   $inlineError.textContent = '';
-  $inlineErrorActions.hidden = true;
 }
 
-function showError(msg, withSettings) {
+function showError(msg) {
   $inlineError.textContent = msg;
   $inlineError.hidden = false;
-  $inlineErrorActions.hidden = !withSettings;
 }
 
 function showInput({ focus = false } = {}) {
@@ -110,9 +105,7 @@ async function explain(text, level) {
     } else {
       const code = res?.errorCode;
       const detail = (res?.detail || '').trim();
-      const needsSettings = code === 'NO_KEY' || code === 'BAD_KEY'
-        || (code === 'RATE_LIMIT' && /limit:\s*0/i.test(detail));
-      showError(errorMessage(code, detail), needsSettings);
+      showError(errorMessage(code, detail));
     }
   } finally {
     setBusy(false);
@@ -122,7 +115,7 @@ async function explain(text, level) {
 $explain.addEventListener('click', () => {
   const text = $input.value.trim();
   if (!text) {
-    showError(errorMessage('TOO_SHORT'), false);
+    showError(errorMessage('TOO_SHORT'));
     return;
   }
   explain(text, 1);

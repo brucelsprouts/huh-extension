@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Huh?",
+  "name": "huh?",
   "version": "0.1.0",
   "description": "Highlight any text and get it explained like you're 5. Powered by Gemini.",
   "icons": {
@@ -10,7 +10,7 @@
   },
   "action": {
     "default_popup": "src/popup/popup.html",
-    "default_title": "Huh?",
+    "default_title": "huh?",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

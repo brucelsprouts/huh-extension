@@ -1,3 +1,5 @@
+html { scrollbar-gutter: stable; overflow-y: scroll; }
+
 @view-transition { navigation: auto; }
 
 ::view-transition-old(root),
@@ -59,18 +61,26 @@
 ::-webkit-scrollbar-corner,
 ::-webkit-scrollbar-button { background: transparent; display: none; }
 
-/* Logo placeholder */
+/* Logo — image only, no frame */
 .logo {
   width: 28px;
   height: 28px;
   object-fit: contain;
   display: inline-block;
   vertical-align: middle;
-  border: 1px solid var(--huh-border);
-  border-radius: var(--huh-radius-sm);
-  background: var(--huh-surface);
 }
 .logo-lg { width: 40px; height: 40px; }
+
+/* Surface tag — small label next to h1 to disambiguate web vs extension */
+.surface-tag {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--huh-text-dim);
+  vertical-align: middle;
+  letter-spacing: 0.05em;
+}
 
 /* Equal-size header nav buttons (settings <-> app) */
 .nav-btn {
