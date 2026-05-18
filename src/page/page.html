@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-surface="page">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>huh? — explain anything</title>
+  <link rel="icon" href="../../icons/icon16.png" />
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="page.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div class="brand">
+        <img class="logo logo-lg" src="../../icons/logo.png" alt="" aria-hidden="true" />
+        <div class="brand-text">
+          <h1>huh?</h1>
+          <p class="subtitle">say it like i'm five — anything you paste, explained simply</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="openPage" class="ghost" type="button" hidden>↗ open</button>
+        <button id="openSettings" class="ghost" type="button">⚙ settings</button>
+      </div>
+    </header>
+
+    <section id="pasteSection" class="card">
+      <div class="card-label">// input</div>
+      <textarea id="pasteInput" rows="6" placeholder="// paste text to explain"></textarea>
+      <button id="explainBtn" class="primary" type="button">explain →</button>
+    </section>
+
+<section id="resultSection" class="card" hidden>
+      <div id="result" class="result"></div>
+      <div class="actions">
+        <button id="simplerBtn" class="ghost" type="button">↓ simpler</button>
+        <button id="copyBtn" class="ghost" type="button">⧉ copy</button>
+        <button id="backBtn" class="ghost" type="button">← new</button>
+        <span id="copyStatus" class="status" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section id="errorSection" class="card" hidden>
+      <p id="errorMsg" class="error"></p>
+      <details id="errorDetailWrap" hidden class="error-details">
+        <summary>// show details</summary>
+        <pre id="errorDetail"></pre>
+      </details>
+      <div class="actions">
+        <button id="errorSettingsBtn" class="primary" type="button" hidden>open settings</button>
+        <button id="errorBackBtn" class="ghost" type="button">← back</button>
+      </div>
+    </section>
+
+    <section id="historySection" class="card" hidden>
+      <div class="section-label">// recent</div>
+      <ul id="historyList" class="history"></ul>
+    </section>
+  </main>
+
+  <script src="../dev/chrome-stub.js"></script>
+  <script type="module" src="../popup/popup.js"></script>
+</body>
+</html>

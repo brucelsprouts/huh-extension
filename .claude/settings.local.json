@@ -10,7 +10,8 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\bruce\\\\Documents\\\\GitHub\\\\huh-extension\" -Force)",
       "Bash(node --test tests/prompts.test.mjs tests/gemini.test.mjs)",
       "Bash(node --test tests/*.test.mjs)",
-      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('manifest.json'\\)\\)\")"
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('manifest.json'\\)\\)\")",
+      "WebFetch(domain:brucelsprouts.com)"
     ]
   }
 }

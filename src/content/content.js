@@ -4,118 +4,118 @@ const CARD_CSS = `
   .card {
     position: fixed;
     z-index: 2147483647;
-    max-width: 380px;
+    max-width: 360px;
     min-width: 280px;
-    background: #fbf6ef;
-    color: #1f1b2e;
-    border: 1.5px solid #ece2d3;
-    border-radius: 14px;
-    box-shadow: 0 20px 40px rgba(31,27,46,0.18), 0 1px 3px rgba(31,27,46,0.08);
-    font-family: "Nunito", "Segoe UI", ui-sans-serif, system-ui, -apple-system, Roboto, sans-serif;
-    font-size: 14px;
+    background: #ffffff;
+    color: #0a0a0a;
+    border: 1px solid #e4e4e7;
+    border-radius: 4px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.05);
+    font-family: ui-monospace, "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12.5px;
     line-height: 1.55;
-    padding: 14px 16px;
-    animation: huh-pop 0.18s ease-out;
+    padding: 12px 14px;
+    overflow: hidden;
   }
   @media (prefers-color-scheme: dark) {
     .card {
-      background: #221d31;
-      color: #f6f1ee;
-      border-color: #2f2942;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.3);
+      background: #111111;
+      color: #fafafa;
+      border-color: #27272a;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.4);
     }
-    button.btn { border-color: #2f2942 !important; }
-    button.btn:hover { background: rgba(165,180,252,0.12) !important; }
-    .close:hover { background: rgba(255,255,255,0.06) !important; }
+    button.btn:hover { background: #18181b !important; color: #fafafa !important; }
+    .close:hover { background: #18181b !important; color: #fafafa !important; }
   }
-  @keyframes huh-pop {
-    from { transform: scale(0.96) translateY(-4px); opacity: 0; }
-    to { transform: scale(1) translateY(0); opacity: 1; }
+  header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom: 10px; }
+  .brand-name {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
   }
-  header { display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px; }
-  .brand { display:inline-flex; align-items:center; gap: 8px; font-weight: 800; font-size: 14px; letter-spacing: -0.01em; }
-  .brand .dot {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #818cf8 0%, #f472b6 100%);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: 900;
-    font-size: 12px;
-    transform: rotate(-6deg);
-    box-shadow: 0 1px 2px rgba(31,27,46,0.15);
+  .brand-sub {
+    font-size: 10px;
+    color: #71717a;
+    margin-top: 2px;
+    font-weight: 400;
   }
-  .brand .dot::after { content: "?"; line-height: 1; }
   .close {
     all: unset;
     cursor: pointer;
-    color: #7a7387;
-    width: 26px;
-    height: 26px;
-    border-radius: 999px;
+    color: #71717a;
+    width: 22px;
+    height: 22px;
+    border-radius: 3px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background 0.12s ease, color 0.12s ease;
   }
-  .close:hover { background: rgba(31,27,46,0.06); color: #1f1b2e; }
-  .body { white-space: pre-wrap; }
-  .actions { display:flex; gap: 6px; margin-top: 12px; align-items:center; flex-wrap: wrap; }
+  .close:hover { background: #f4f4f5; color: #0a0a0a; }
+  .body {
+    white-space: pre-wrap;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .actions { display:flex; gap: 2px; margin-top: 10px; align-items:center; flex-wrap: wrap; }
   button.btn {
     all: unset;
     cursor: pointer;
     font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 7px 12px;
-    border-radius: 999px;
-    border: 1.5px solid #ece2d3;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 5px 9px;
+    border-radius: 3px;
     background: transparent;
-    color: inherit;
-    transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    color: #71717a;
+    transition: background 0.12s ease, color 0.12s ease;
   }
-  button.btn:hover { background: rgba(99,102,241,0.08); transform: translateY(-1px); }
-  button.btn:active { transform: translateY(0); }
-  button.btn[disabled] { opacity: 0.55; cursor: not-allowed; transform: none; }
-  button.btn.primary {
-    background: linear-gradient(135deg, #818cf8 0%, #f472b6 100%);
-    color: #fff;
-    border-color: transparent;
+  button.btn:hover { color: #0a0a0a; background: #f4f4f5; }
+  button.btn[disabled] { opacity: 0.4; cursor: not-allowed; }
+  .status {
+    font-size: 11px;
+    color: #0a0a0a;
+    margin-left: auto;
+    font-weight: 500;
   }
-  .status { font-size: 12px; color: #7a7387; }
-  .error { color: #dc2626; }
-  .loading { display:flex; gap:8px; padding: 12px 0; align-items: center; }
+  @media (prefers-color-scheme: dark) {
+    .status { color: #fafafa; }
+  }
+  .error::before { content: "[!] "; font-weight: 700; }
+  .loading { display:flex; gap:6px; padding: 10px 0; }
   .loading span {
-    width:10px; height:10px; border-radius:50%; background:#818cf8;
-    animation: huh-bounce 1.1s infinite ease-in-out;
+    width:6px; height:6px; border-radius:50%; background:#0a0a0a;
+    opacity: 0.30;
+    animation: huh-blink 1.4s infinite;
   }
-  .loading span:nth-child(2) { background: #f472b6; animation-delay: .18s; }
-  .loading span:nth-child(3) { animation-delay: .36s; }
-  .thinking-text { font-size: 12px; color: #7a7387; font-style: italic; margin-left: 4px; }
-  @keyframes huh-bounce {
-    0%,80%,100% { transform: scale(0.5) translateY(0); opacity: 0.4; }
-    40% { transform: scale(1) translateY(-4px); opacity: 1; }
+  .loading span:nth-child(2) { animation-delay: 0.2s; }
+  .loading span:nth-child(3) { animation-delay: 0.4s; }
+  @media (prefers-color-scheme: dark) {
+    .loading span { background: #fafafa; }
+  }
+  @keyframes huh-blink {
+    0%,100% { opacity: 0.15; }
+    40%     { opacity: 1; }
   }
 `;
 
-function errorMessage(code) {
+function errorMessage(code, detail) {
+  if (code === 'RATE_LIMIT' && /limit:\s*0/i.test(detail || '')) {
+    return "Project quota is 0. Open Settings → change model, or use a different API key.";
+  }
   switch (code) {
-    case 'NO_KEY': return "Add your Gemini API key in Settings to get started.";
-    case 'BAD_KEY': return "That key didn't work. Check it in Settings.";
-    case 'RATE_LIMIT': return "Gemini is rate-limiting you. Wait a minute.";
-    case 'TOO_LONG': return "That's a lot of text! Try a smaller chunk.";
-    case 'TOO_SHORT': return "Couldn't read your selection. Try the popup paste mode.";
-    case 'NETWORK': return "Can't reach Gemini. Check your internet.";
-    case 'SERVER': return "Gemini hiccupped. Try again in a sec.";
-    default: return "Something went wrong. Try again.";
+    case 'NO_KEY': return "Add your API key in Settings.";
+    case 'BAD_KEY': return "Invalid API key.";
+    case 'RATE_LIMIT': return "Rate limit hit. Wait ~60 seconds.";
+    case 'TOO_LONG': return "Too long. Try a smaller chunk.";
+    case 'TOO_SHORT': return "No selection. Try the popup paste mode.";
+    case 'NETWORK': return "Network error.";
+    case 'SERVER': return "Server error. Try again.";
+    default: return "Something went wrong.";
   }
 }
 
@@ -157,7 +157,10 @@ function renderCard({ state }) {
     <style>${CARD_CSS}</style>
     <div class="card" role="dialog" aria-label="Huh? explanation">
       <header>
-        <span class="brand"><span class="dot" aria-hidden="true"></span>Huh?</span>
+        <span class="brand">
+          <div class="brand-name">huh?</div>
+          <div class="brand-sub">say it like i'm five</div>
+        </span>
         <button class="close" data-action="close" aria-label="Close">×</button>
       </header>
       <div class="content"></div>
@@ -168,27 +171,30 @@ function renderCard({ state }) {
   positionCard(cardEl);
 
   if (state.kind === 'loading') {
-    content.innerHTML = `<div class="loading"><span></span><span></span><span></span><span class="thinking-text">Thinking like a 5-year-old…</span></div>`;
+    content.innerHTML = `<div class="loading"><span></span><span></span><span></span></div>`;
   } else if (state.kind === 'result') {
     content.innerHTML = `
       <div class="body"></div>
       <div class="actions">
-        <button class="btn" data-action="simpler">Simpler please</button>
-        <button class="btn" data-action="copy">Copy</button>
+        <button class="btn" data-action="simpler">↓ simpler</button>
+        <button class="btn" data-action="copy">⧉ copy</button>
+        <button class="btn" data-action="openSettings">⚙ settings</button>
         <span class="status" data-role="status"></span>
       </div>
     `;
     content.querySelector('.body').textContent = state.explanation;
   } else if (state.kind === 'error') {
     const isKeyErr = state.errorCode === 'NO_KEY' || state.errorCode === 'BAD_KEY';
+    const isQuotaZero = state.errorCode === 'RATE_LIMIT' && /limit:\s*0/i.test(state.detail || '');
+    const showSettings = isKeyErr || isQuotaZero;
     content.innerHTML = `
       <div class="body error"></div>
       <div class="actions">
-        ${isKeyErr ? '<button class="btn" data-action="openSettings">Open Settings</button>' : ''}
-        <button class="btn" data-action="close">Dismiss</button>
+        ${showSettings ? '<button class="btn" data-action="openSettings">⚙ settings</button>' : ''}
+        <button class="btn" data-action="close">dismiss</button>
       </div>
     `;
-    content.querySelector('.body').textContent = errorMessage(state.errorCode);
+    content.querySelector('.body').textContent = errorMessage(state.errorCode, state.detail);
   }
 
   root.querySelectorAll('[data-action]').forEach(el => {
@@ -242,7 +248,7 @@ async function run(text, level) {
     if (res?.ok) {
       renderCard({ state: { kind: 'result', explanation: res.explanation } });
     } else {
-      renderCard({ state: { kind: 'error', errorCode: res?.errorCode || 'UNKNOWN' } });
+      renderCard({ state: { kind: 'error', errorCode: res?.errorCode || 'UNKNOWN', detail: res?.detail || '' } });
     }
   } finally {
     inFlight = false;

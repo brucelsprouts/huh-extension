@@ -1,6 +1,6 @@
 import { buildPrompt } from '../lib/prompts.js';
 import { callGemini, precheckInput } from '../lib/gemini.js';
-import { getApiKey, getHistory, clearHistory, pushHistory } from '../lib/storage.js';
+import { getApiKey, getModel, getHistory, clearHistory, pushHistory, deleteHistoryItem } from '../lib/storage.js';
 
 const CONTEXT_MENU_ID = 'huh-explain-selection';
 
@@ -41,6 +41,9 @@ async function handleMessage(msg) {
     case 'clearHistory':
       await clearHistory();
       return { ok: true };
+    case 'deleteHistoryItem':
+      await deleteHistoryItem(msg.id);
+      return { ok: true };
     case 'openOptions':
       await chrome.runtime.openOptionsPage();
       return { ok: true };
@@ -63,14 +66,18 @@ async function doExplain(text, level) {
     return { ok: false, errorCode: 'UNKNOWN', detail: String(err) };
   }
 
+  const model = await getModel();
   const result = await callGemini({
     apiKey,
+    model,
     system: promptParts.system,
     user: promptParts.user,
   });
 
   if (result.ok) {
     await pushHistory({ text, explanation: result.explanation, level });
+  } else {
+    console.warn('[Huh?] Gemini error:', result.errorCode, result.detail || '');
   }
   return result;
 }

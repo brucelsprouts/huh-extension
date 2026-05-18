@@ -1,6 +1,11 @@
 export const MAX_INPUT_CHARS = 30000;
-const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+export const DEFAULT_MODEL = 'gemini-2.5-flash-lite';
+const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+const RETRY_DELAY_MS = 1200;
+
+function urlFor(model) {
+  return `${GEMINI_BASE}/${encodeURIComponent(model || DEFAULT_MODEL)}:generateContent`;
+}
 
 export function precheckInput(text) {
   if (typeof text !== 'string' || text.trim().length === 0) return 'TOO_SHORT';
@@ -17,10 +22,22 @@ export function classifyError(info) {
   return 'UNKNOWN';
 }
 
-export async function callGemini({ apiKey, system, user, fetchImpl = fetch }) {
-  if (!apiKey) {
-    return { ok: false, errorCode: 'NO_KEY' };
+async function fetchOnce({ apiKey, model, body, fetchImpl }) {
+  let response;
+  try {
+    response = await fetchImpl(`${urlFor(model)}?key=${encodeURIComponent(apiKey)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    return { networkError: true, detail: String(err) };
   }
+  return { response };
+}
+
+export async function callGemini({ apiKey, model, system, user, fetchImpl = fetch, sleep = (ms) => new Promise(r => setTimeout(r, ms)) }) {
+  if (!apiKey) return { ok: false, errorCode: 'NO_KEY' };
 
   const body = {
     systemInstruction: { parts: [{ text: system }] },
@@ -28,25 +45,25 @@ export async function callGemini({ apiKey, system, user, fetchImpl = fetch }) {
     generationConfig: { temperature: 0.6 },
   };
 
-  let response;
-  try {
-    response = await fetchImpl(`${GEMINI_URL}?key=${encodeURIComponent(apiKey)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-  } catch (err) {
-    return { ok: false, errorCode: classifyError({ networkError: true }), detail: String(err) };
+  let attempt = await fetchOnce({ apiKey, model, body, fetchImpl });
+  if (attempt.networkError) {
+    return { ok: false, errorCode: 'NETWORK', detail: attempt.detail };
   }
 
+  // One automatic retry on 429 — Gemini's free tier rate-limits aggressively in short bursts.
+  if (attempt.response.status === 429) {
+    await sleep(RETRY_DELAY_MS);
+    attempt = await fetchOnce({ apiKey, model, body, fetchImpl });
+    if (attempt.networkError) {
+      return { ok: false, errorCode: 'NETWORK', detail: attempt.detail };
+    }
+  }
+
+  const response = attempt.response;
   if (!response.ok) {
     const errorCode = classifyError({ status: response.status });
     let detail = '';
-    try {
-      detail = await response.text();
-    } catch (_) {
-      /* ignore */
-    }
+    try { detail = await response.text(); } catch (_) { /* ignore */ }
     return { ok: false, errorCode, detail };
   }
 

@@ -2,56 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Huh? — Settings</title>
+  <title>huh? — config</title>
+  <link rel="icon" href="../../icons/icon16.png" />
   <link rel="stylesheet" href="../shared/theme.css" />
   <link rel="stylesheet" href="settings.css" />
 </head>
 <body>
   <main class="container">
     <header>
-      <span class="huh-logo">
-        <span class="mark" aria-hidden="true"></span>
-        <span>Huh? Settings</span>
-      </span>
-      <p class="subtitle">Your key and history live on this device only — nothing leaves your browser.</p>
+      <div class="brand">
+        <img class="logo logo-lg" src="../../icons/logo.png" alt="" aria-hidden="true" />
+        <div class="brand-text">
+          <h1>huh?</h1>
+          <p class="subtitle">config &mdash; everything is stored locally on this device</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="openPage" class="ghost" type="button">↗ open app</button>
+      </div>
     </header>
 
     <section class="card">
-      <div class="card-header">
-        <h2>Gemini API key</h2>
-        <span class="badge">required</span>
-      </div>
-      <p class="hint">
-        Get a free key at
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>,
-        then paste it below.
-      </p>
+      <div class="card-label">// api key</div>
+      <p class="hint">→ get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a></p>
       <div class="row">
-        <input id="apiKey" type="password" placeholder="Paste your Gemini API key" autocomplete="off" spellcheck="false" />
-        <button id="toggleVisibility" type="button" class="ghost">Show</button>
+        <input id="apiKey" type="password" placeholder="paste gemini key" autocomplete="off" spellcheck="false" />
+        <button id="toggleVisibility" type="button" class="ghost">show</button>
       </div>
       <div class="row">
-        <button id="save" class="primary" type="button">Save key</button>
+        <button id="save" class="primary" type="button">save</button>
         <span id="status" class="status" aria-live="polite"></span>
       </div>
     </section>
 
     <section class="card">
-      <div class="card-header">
-        <h2>History</h2>
-      </div>
+      <div class="card-label">// model</div>
+      <p class="hint">if you hit "quota: 0" errors, try another model</p>
+      <select id="modelSelect" class="select"></select>
+    </section>
+
+    <section class="card">
+      <div class="card-label">// history</div>
       <label class="switch">
         <input id="historyEnabled" type="checkbox" />
         <span class="switch-track"><span class="switch-thumb"></span></span>
-        <span class="switch-label">Remember what I've looked up <span class="muted">(last 5)</span></span>
+        <span class="switch-label">remember explanations</span>
       </label>
-      <p class="hint">Stored locally on this device. Never transmitted.</p>
-      <button id="clearHistory" class="danger" type="button">Clear history</button>
-    </section>
+      <div class="row inline-row">
+        <label for="historyLimit" class="inline-label">keep last</label>
+        <input id="historyLimit" type="number" min="1" max="50" step="1" class="number-input" />
+        <span class="inline-label muted">(1&ndash;50)</span>
+      </div>
 
-    <footer class="footer">
-      Built with too much coffee and not enough sleep. ☕
-    </footer>
+      <div id="historyManager" class="history-manager" hidden>
+        <div class="history-toolbar">
+          <span class="history-count" id="historyCount"></span>
+          <div class="history-toolbar-actions">
+            <button id="copyAllHistory" type="button" class="ghost">⧉ copy all</button>
+            <button id="exportHistory" type="button" class="ghost">↓ export</button>
+            <button id="clearHistory" type="button" class="danger">clear</button>
+          </div>
+        </div>
+        <ul id="historyList" class="history"></ul>
+      </div>
+
+      <p id="historyEmpty" class="hint history-empty" hidden>// no explanations stored yet</p>
+    </section>
   </main>
   <script src="../dev/chrome-stub.js"></script>
   <script type="module" src="settings.js"></script>

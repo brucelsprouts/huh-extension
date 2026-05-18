@@ -5,7 +5,9 @@
 
   const fakeStorage = {
     apiKey: '',
+    model: 'gemini-2.5-flash-lite',
     historyEnabled: true,
+    historyLimit: 5,
     history: [
       {
         id: 'demo-1',
