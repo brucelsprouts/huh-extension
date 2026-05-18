@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>huh? — config</title>
+  <link rel="icon" href="/icons/icon16.png" />
+  <link rel="stylesheet" href="/src/shared/theme.css" />
+  <link rel="stylesheet" href="/src/settings/settings.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div class="brand">
+        <img class="logo logo-lg" src="/icons/logo.png" alt="" aria-hidden="true" />
+        <div class="brand-text">
+          <h1>huh?</h1>
+          <p class="subtitle">config &mdash; everything is stored locally in your browser</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a id="openPage" class="ghost nav-btn" href="/">↗ open app</a>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="card-label">// api key</div>
+      <p class="hint">→ get a free key at <a href="https://aistudio.google.com/app/apikey">aistudio.google.com</a></p>
+      <div class="row">
+        <input id="apiKey" type="password" placeholder="paste gemini key" autocomplete="off" spellcheck="false" />
+        <button id="toggleVisibility" type="button" class="ghost">show</button>
+      </div>
+      <div class="row">
+        <button id="save" class="primary" type="button">save</button>
+        <span id="status" class="status" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-label">// model</div>
+      <p class="hint">if you hit "quota: 0" errors, try another model</p>
+      <select id="modelSelect" class="select"></select>
+    </section>
+
+    <section class="card">
+      <div class="card-label">// history</div>
+      <label class="switch">
+        <input id="historyEnabled" type="checkbox" />
+        <span class="switch-track"><span class="switch-thumb"></span></span>
+        <span class="switch-label">remember explanations</span>
+      </label>
+      <div class="row inline-row">
+        <label for="historyLimit" class="inline-label">keep last</label>
+        <input id="historyLimit" type="number" min="1" max="50" step="1" class="number-input" />
+        <span class="inline-label muted">(1&ndash;50)</span>
+      </div>
+
+      <div id="historyManager" class="history-manager" hidden>
+        <div class="history-toolbar">
+          <span class="history-count" id="historyCount"></span>
+          <div class="history-toolbar-actions">
+            <button id="copyAllHistory" type="button" class="ghost">⧉ copy all</button>
+            <button id="exportHistory" type="button" class="ghost">↓ export</button>
+            <button id="clearHistory" type="button" class="danger">clear</button>
+          </div>
+        </div>
+        <ul id="historyList" class="history"></ul>
+      </div>
+
+      <p id="historyEmpty" class="hint history-empty" hidden>// no explanations stored yet</p>
+    </section>
+  </main>
+  <script type="module" src="/settings.js"></script>
+</body>
+</html>

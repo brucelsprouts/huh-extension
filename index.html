@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" data-surface="page">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>huh? — explain anything</title>
+  <meta name="description" content="Paste dense or confusing text — get it back explained simply, like you're five." />
+  <link rel="icon" href="/icons/icon16.png" />
+  <link rel="stylesheet" href="/src/shared/theme.css" />
+  <link rel="stylesheet" href="/src/page/page.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div class="brand">
+        <img class="logo logo-lg" src="/icons/logo.png" alt="" aria-hidden="true" />
+        <div class="brand-text">
+          <h1>huh?</h1>
+          <p class="subtitle">say it like i'm five — anything you paste, explained simply</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a id="openSettings" class="ghost nav-btn" href="/settings.html">⚙ settings</a>
+      </div>
+    </header>
+
+    <section id="pasteSection" class="card">
+      <div class="card-label">// input</div>
+      <textarea id="pasteInput" rows="6" placeholder="// paste text to explain"></textarea>
+      <button id="explainBtn" class="primary" type="button">explain →</button>
+      <p id="inlineError" class="inline-error" hidden></p>
+      <div class="inline-error-actions" id="inlineErrorActions" hidden>
+        <a id="errorSettingsBtn" class="ghost nav-btn" href="/settings.html">⚙ open settings</a>
+      </div>
+    </section>
+
+    <section id="resultSection" class="card" hidden>
+      <div id="result" class="result"></div>
+      <div class="actions">
+        <button id="simplerBtn" class="ghost" type="button">↓ simpler</button>
+        <button id="copyBtn" class="ghost" type="button">⧉ copy</button>
+        <button id="backBtn" class="ghost" type="button">← new</button>
+        <span id="copyStatus" class="status" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section id="historySection" class="card" hidden>
+      <div class="section-label">// recent</div>
+      <ul id="historyList" class="history"></ul>
+    </section>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

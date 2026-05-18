@@ -1,3 +1,16 @@
+@view-transition { navigation: auto; }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
+
 :root {
   --huh-bg: #ffffff;
   --huh-surface: #fafafa;
@@ -54,3 +67,32 @@
   background: var(--huh-surface);
 }
 .logo-lg { width: 40px; height: 40px; }
+
+/* Equal-size header nav buttons (settings <-> app) */
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 130px;
+  height: 32px;
+  padding: 0 14px;
+  box-sizing: border-box;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Inline error shown under the input/explain button */
+.inline-error {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--huh-text);
+  border: 1px solid var(--huh-border);
+  border-left: 2px solid var(--huh-text);
+  border-radius: var(--huh-radius);
+  background: var(--huh-bg);
+  white-space: pre-wrap;
+}
+.inline-error::before { content: "[!] "; font-weight: 700; }
+.inline-error-actions { margin-top: 8px; display: flex; gap: 6px; }

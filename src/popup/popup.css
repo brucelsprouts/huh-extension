@@ -119,19 +119,6 @@ button.ghost:hover {
   max-height: 320px;
   overflow-y: auto;
 }
-.result::before {
-  content: "// output";
-  position: absolute;
-  top: -7px;
-  left: 10px;
-  background: var(--huh-bg);
-  padding: 0 6px;
-  font-family: var(--huh-font-mono);
-  font-size: 9.5px;
-  color: var(--huh-text-muted);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
 
 .loading {
   display: flex;
